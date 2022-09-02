@@ -1,35 +1,29 @@
-pipeline{
-  agent any
-  stages{
-  	stage('version-control'){
-  		steps{
-  			checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-id', url: 'https://github.com/MosesOrganization/third-demo.git']]])
-  		}
-  	}
-    stage('parallel-job'){
-      parallel{
-        stage('sub-job1'){
-          steps{
-            echo 'action1'
-          }
-        }
-        stage('sub-job2'){
-          steps{
-            echo 'action2'
-            echo " testing third demo"
-          }
-        }
-        stage('sub-job3'){
-            steps{
-                echo 'action3'
-            }
+pipeline {
+    agent any
+    stages {
+      stage('clone'){
+        steps{
+        checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[credentialsId: 'github-id', url: 'https://github.com/MosesOrganization/third-demo.git']]])
         }
       }
+        stage('Main Branch Deploy Code') {
+            when {
+                branch 'main'
+            }
+            steps {
+                sh 'echo "Building Artifact from Main branch"'
+ 
+                sh 'echo "Deploying Code from Main branch"'
+            }
+        }
+        stage('Develop Branch Deploy Code') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                sh 'echo "Building Artifact from Develop branch"'
+                sh 'echo "Deploying Code from Develop branch"'
+           }
+        }
     }
-    stage('codebuild'){
-    	steps{
-    		sh 'cat /etc/passwd'
-    	}
-    }
-  }
 }
